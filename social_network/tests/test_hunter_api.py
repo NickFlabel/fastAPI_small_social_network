@@ -7,7 +7,6 @@ import json
 from social_network.tests.utils import UserForTesting
 from social_network.utils.hunter_api import get_hunter_data, validate_email
 
-dotenv.load_dotenv()
 HUNTER_API_KEY = os.getenv('HUNTER_API_KEY')
 HUNTER_URL = os.getenv('HUNTER_URL')
 

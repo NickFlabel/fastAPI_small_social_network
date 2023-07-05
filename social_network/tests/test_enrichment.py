@@ -9,7 +9,6 @@ from social_network.tests.fixtures import database
 from social_network.utils.enrichment_api import get_enrichment_data, save_enrichment_data
 from social_network.db.db import get_test_db
 
-dotenv.load_dotenv()
 ENRICHMENT_URL = os.getenv('ENRICHMENT_URL')
 
 db = get_test_db().__next__()

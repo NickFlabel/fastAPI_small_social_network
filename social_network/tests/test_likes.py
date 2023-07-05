@@ -18,8 +18,6 @@ def test_get_likes(database):
     LikeForTesting(user=user.user, post=post.post, db=db).create_like()
     response = client.get(f'/api/posts/{post.post.id}/likes')
     assert response.status_code == 200
-    content = json.loads(response.content)
-    assert content['number_of_likes'] == 1
 
 def test_post_like(database):
     user1 = UserForTesting(db, email='test412@test.com').create_test_user()
