@@ -1,12 +1,19 @@
 import json
 from fastapi.testclient import TestClient
 from social_network.app import app
+from social_network.config import Settings, get_settings
 from social_network.db.db import get_db, get_test_db
 from social_network.db.models import Post
 from social_network.tests.fixtures import database
 from social_network.tests.utils import UserForTesting, PostForTesting, LikeForTesting
 
+def get_settings_no_caching():
+    settings = Settings()
+    settings.caching = False
+    return settings
+
 app.dependency_overrides[get_db] = get_test_db
+app.dependency_overrides[get_settings] = get_settings_no_caching
 
 db = get_test_db().__next__()
 
