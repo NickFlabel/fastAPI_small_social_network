@@ -33,7 +33,11 @@ class Crud(ABC):
 
     def put(self, id, data):
         db_entity = self.get(id, 'id')
-        for key, value in data.dict().items():
+        try:
+            data = data.dict()
+        except AttributeError:
+            pass
+        for key, value in data.items():
             if hasattr(db_entity, key):
                 setattr(db_entity, key, value)
         self.db.commit()

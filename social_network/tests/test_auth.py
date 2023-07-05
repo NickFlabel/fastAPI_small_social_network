@@ -8,8 +8,15 @@ from social_network.db.models import User
 from social_network.tests.fixtures import database
 from social_network.tests.utils import UserForTesting
 from social_network.utils.auth import get_current_user
+from social_network.config import Settings, get_settings
+
+def get_test_settings():
+    settings = Settings()
+    settings.email_validation = False
+    return settings
 
 app.dependency_overrides[get_db] = get_test_db
+app.dependency_overrides[get_settings] = get_test_settings
 
 db = get_test_db().__next__()
 

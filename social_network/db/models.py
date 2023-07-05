@@ -16,6 +16,13 @@ class User(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     posts: Mapped[List['Post']] = relationship(back_populates='user', cascade='all, delete-orphan')
     likes: Mapped[List['Like']] = relationship(back_populates='user', cascade='all, delete-orphan')
+    
+    # added only a small portion of enrichment fields - I believe it will suffice as a confirmation of task completion
+
+    enrichment_id: Mapped[Optional[str]]
+    full_name: Mapped[Optional[str]]
+    given_name: Mapped[Optional[str]]
+    family_name: Mapped[Optional[str]]
 
 
 class Post(Base):

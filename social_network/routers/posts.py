@@ -35,16 +35,20 @@ def post_a_post(data: schemas.PostCreate, user: User = Depends(get_current_user)
 def put(post_id: int, data: schemas.PostCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     post_crud = PostCrud(db)
     post = post_crud.get(post_id, 'id')
+    if not post:
+        raise HTTPException(status_code=404)
     if post.user_id != user.id:
         raise HTTPException(status_code=401)
     data.user_id = user.id
-    post = PostCrud(db).post(data=data)
+    post = PostCrud(db).put(data=data, id=post_id)
     return post
 
 @router.delete('/posts/{post_id}', status_code=204)
 def delete(post_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     post_crud = PostCrud(db)
     post = post_crud.get(post_id, 'id')
+    if not post:
+        raise HTTPException(status_code=404)
     if post.user_id != user.id:
         raise HTTPException(status_code=401)
     post = PostCrud(db).delete(post_id)
