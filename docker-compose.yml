@@ -28,6 +28,7 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_ENCODING=utf-8
+      - CACHE_TIMEOUT=60
 
   db:
       image: postgres:13

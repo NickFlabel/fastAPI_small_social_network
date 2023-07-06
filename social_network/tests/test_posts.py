@@ -3,16 +3,14 @@ from fastapi.testclient import TestClient
 from social_network.app import app
 from social_network.db.db import get_db, get_test_db
 from social_network.db.models import Post
-from social_network.tests.fixtures import database
+from social_network.tests.fixtures import database, override_db_and_settings
 from social_network.tests.utils import UserForTesting, PostForTesting
-
-app.dependency_overrides[get_db] = get_test_db
 
 db = get_test_db().__next__()
 
 client = TestClient(app)
 
-def test_get_all_posts(database):
+def test_get_all_posts(database, override_db_and_settings):
     user = UserForTesting(db).create_test_user()
     post = PostForTesting(user.get_user()).create_test_post()
     response = client.get('/api/posts')
@@ -20,17 +18,17 @@ def test_get_all_posts(database):
     content = json.loads(response.content)
     assert content[0]['content'] == post.content
 
-def test_one_post(database):
+def test_one_post(database, override_db_and_settings):
     user = UserForTesting(db, email='test311@test.com').create_test_user()
     post = PostForTesting(user.get_user()).create_test_post()
     response = client.get(f'/api/posts/{post.post.id}')
     assert response.status_code == 200
 
-def test_invalid_post_id(database):
+def test_invalid_post_id(database, override_db_and_settings):
     response = client.get(f'/api/posts/1234567')
     assert response.status_code == 404
 
-def test_post(database):
+def test_post(database, override_db_and_settings):
     user = UserForTesting(db, email='test312@test.com').create_test_user()
     content = 'test'
     token = user.login_user(client).get_token()
@@ -45,7 +43,7 @@ def test_post(database):
     assert new_post.user == user.user
     assert new_post.user.id == user.user.id
 
-def test_put(database):
+def test_put(database, override_db_and_settings):
     user = UserForTesting(db, email='test313@test.com').create_test_user()
     post = PostForTesting(user.get_user()).create_test_post()
     new_content = 'new_test'
@@ -56,7 +54,7 @@ def test_put(database):
     response = client.put(f'/api/posts/{post.post.id}', headers=headers, json={'content': new_content})
     assert response.status_code == 200
 
-def test_put_wrong_user(database):
+def test_put_wrong_user(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test314@test.com').create_test_user()
     user2 = UserForTesting(db, email='test315@test.com').create_test_user()
     post = PostForTesting(user1.get_user()).create_test_post()
@@ -68,7 +66,7 @@ def test_put_wrong_user(database):
     response = client.put(f'/api/posts/{post.post.id}', headers=headers, json={'content': new_content})
     assert response.status_code == 401
 
-def test_delete(database):
+def test_delete(database, override_db_and_settings):
     user = UserForTesting(db, email='test316@test.com').create_test_user()
     post = PostForTesting(user.get_user()).create_test_post()
     new_content = 'new_test'
@@ -79,7 +77,7 @@ def test_delete(database):
     response = client.delete(f'/api/posts/{post.post.id}', headers=headers)
     assert response.status_code == 204
 
-def test_delete_wrong_user(database):
+def test_delete_wrong_user(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test317@test.com').create_test_user()
     user2 = UserForTesting(db, email='test318@test.com').create_test_user()
     post = PostForTesting(user1.get_user()).create_test_post()

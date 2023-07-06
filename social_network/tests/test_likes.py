@@ -4,29 +4,21 @@ from social_network.app import app
 from social_network.config import Settings, get_settings
 from social_network.db.db import get_db, get_test_db
 from social_network.db.models import Post
-from social_network.tests.fixtures import database
+from social_network.tests.fixtures import database, override_db_and_settings
 from social_network.tests.utils import UserForTesting, PostForTesting, LikeForTesting
-
-def get_settings_no_caching():
-    settings = Settings()
-    settings.caching = False
-    return settings
-
-app.dependency_overrides[get_db] = get_test_db
-app.dependency_overrides[get_settings] = get_settings_no_caching
 
 db = get_test_db().__next__()
 
 client = TestClient(app)
 
-def test_get_likes(database):
+def test_get_likes(database, override_db_and_settings):
     user = UserForTesting(db, email='test411@test.com').create_test_user()
     post = PostForTesting(user.get_user(), db=db).create_test_post()
     LikeForTesting(user=user.user, post=post.post, db=db).create_like()
     response = client.get(f'/api/posts/{post.post.id}/likes')
     assert response.status_code == 200
 
-def test_post_like(database):
+def test_post_like(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test412@test.com').create_test_user()
     user2 = UserForTesting(db, email='test413@test.com').create_test_user()
     post = PostForTesting(user1.get_user(), db=db).create_test_post()
@@ -37,7 +29,7 @@ def test_post_like(database):
     response = client.post(f'/api/posts/{post.post.id}/likes', headers=headers, json={'direction': True})
     assert response.status_code == 201
 
-def test_post_like_own_post(database):
+def test_post_like_own_post(database, override_db_and_settings):
     user = UserForTesting(db, email='test414@test.com').create_test_user()
     post = PostForTesting(user.get_user(), db=db).create_test_post()
     token = user.login_user(client).get_token()
@@ -47,7 +39,7 @@ def test_post_like_own_post(database):
     response = client.post(f'/api/posts/{post.post.id}/likes', headers=headers, json={'direction': True})
     assert response.status_code == 401
 
-def test_post_already_liked_post(database):
+def test_post_already_liked_post(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test415@test.com').create_test_user()
     user2 = UserForTesting(db, email='test416@test.com').create_test_user()
     post = PostForTesting(user1.get_user(), db=db).create_test_post()
@@ -59,7 +51,7 @@ def test_post_already_liked_post(database):
     response = client.post(f'/api/posts/{post.post.id}/likes', headers=headers, json={'direction': True})
     assert response.status_code == 409
 
-def test_put_like(database):
+def test_put_like(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test417@test.com').create_test_user()
     user2 = UserForTesting(db, email='test418@test.com').create_test_user()
     post = PostForTesting(user1.get_user(), db=db).create_test_post()
@@ -73,7 +65,7 @@ def test_put_like(database):
     content = json.loads(response.content)
     assert content['direction'] == False
 
-def test_put_like_wrong_user(database):
+def test_put_like_wrong_user(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test419@test.com').create_test_user()
     user2 = UserForTesting(db, email='test420@test.com').create_test_user()
     post = PostForTesting(user2.get_user(), db=db).create_test_post()
@@ -85,7 +77,7 @@ def test_put_like_wrong_user(database):
     response = client.put(f'/api/posts/{post.post.id}/likes', headers=headers, json={'direction': False})
     assert response.status_code == 404
 
-def test_delete_like(database):
+def test_delete_like(database, override_db_and_settings):
     user = UserForTesting(db, email='test421@test.com').create_test_user()
     post = PostForTesting(user.get_user(), db=db).create_test_post()
     LikeForTesting(user=user.user, post=post.post, db=db).create_like()
@@ -96,7 +88,7 @@ def test_delete_like(database):
     response = client.delete(f'/api/posts/{post.post.id}/likes', headers=headers)
     assert response.status_code == 204
 
-def test_delete_like_wrong_user(database):
+def test_delete_like_wrong_user(database, override_db_and_settings):
     user1 = UserForTesting(db, email='test422@test.com').create_test_user()
     user2 = UserForTesting(db, email='test423@test.com').create_test_user()
     post = PostForTesting(user1.get_user(), db=db).create_test_post()
