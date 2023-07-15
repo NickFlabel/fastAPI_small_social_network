@@ -14,7 +14,7 @@ Make sure you have the following installed on your system:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/social-network-app.git
+   git clone https://github.com/NickFlabel/social-network-app.git
 
 2. Edit docker-compose.yml file to add API keys for HUNTER_API_KEY and ENRICHMENT_API_KEY. The app will work without said keys but it will not use these services.
 
